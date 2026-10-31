@@ -1,3 +1,4 @@
+const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 import { useEffect, useMemo, useState } from "react";
 import {
   Plus,
@@ -52,7 +53,7 @@ function App() {
       if (search.trim()) params.set("search", search.trim());
       if (statusFilter !== "All") params.set("status", statusFilter);
       if (priorityFilter !== "All") params.set("priority", priorityFilter);
-      const response = await fetch(`/api/tasks?${params}`);
+      const response = await fetch(`${API_BASE}/api/tasks?${params}`);
       if (!response.ok) throw new Error("Unable to load tasks");
       setTasks(await response.json());
     } catch (e) {
@@ -100,7 +101,7 @@ function App() {
     setError("");
     try {
       const response = await fetch(
-        editing ? `/api/tasks/${editing._id}` : "/api/tasks",
+        editing ? `${API_BASE}/api/tasks/${editing._id}` : "/api/tasks",
         {
           method: editing ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -124,7 +125,9 @@ function App() {
   async function deleteTask(id) {
     if (!window.confirm("Delete this task? This cannot be undone.")) return;
     try {
-      const response = await fetch(`/api/tasks/${id}`, { method: "DELETE" });
+      const response = await fetch(`${API_BASE}/api/tasks/${id}`, {
+        method: "DELETE",
+      });
       if (!response.ok) throw new Error("Could not delete task");
       await loadTasks();
     } catch (e) {
@@ -135,7 +138,7 @@ function App() {
     const next =
       statuses[(statuses.indexOf(task.status) + 1) % statuses.length];
     try {
-      const response = await fetch(`/api/tasks/${task._id}`, {
+      const response = await fetch(`${API_BASE}/api/tasks/${task._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: next }),
